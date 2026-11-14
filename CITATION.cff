@@ -4,6 +4,7 @@ title: "Bayesian Reading of Hazard Ratios: calculator and simulation code"
 version: "1.0"
 date-released: "2026-11-13"
 license: MIT
+doi: "10.5281/zenodo.24213483"
 repository-code: "https://github.com/emantoraih/trinetx-bayes-calculator"
 url: "https://emantoraih.github.io/trinetx-bayes-calculator/"
 authors:
