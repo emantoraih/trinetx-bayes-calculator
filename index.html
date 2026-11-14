@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bayesian HR Calculator</title>
+<meta name="description" content="Free calculator: turn a hazard ratio and 95% confidence interval from TriNetX or any observational study into the probability of a clinically meaningful benefit, allowing for systematic error.">
+<style>
+:root{--bg:#f7f9fc;--card:#ffffff;--ink:#1b2430;--muted:#5b6675;--line:#d9e0ea;--navy:#1f3864;--blue:#2f5597;--blue-soft:#dbe5f1;--grey:#9aa3ad;--red:#c00000;--green:#2e7d32;--shadow:0 1px 3px rgba(0,0,0,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f141b;--card:#18202b;--ink:#e6ebf2;--muted:#9aa6b5;--line:#2c3746;--navy:#9fb8e8;--blue:#7fa2e0;--blue-soft:#22314a;--grey:#6f7a87;--red:#ff6b6b;--green:#6fcf75;--shadow:none}}
+:root[data-theme="dark"]{--bg:#0f141b;--card:#18202b;--ink:#e6ebf2;--muted:#9aa6b5;--line:#2c3746;--navy:#9fb8e8;--blue:#7fa2e0;--blue-soft:#22314a;--grey:#6f7a87;--red:#ff6b6b;--green:#6fcf75;--shadow:none}
+*{box-sizing:border-box}
+.grid>*,header .wrap>*,.row2>*,.row3>*{min-width:0}
+select,input{max-width:100%;text-overflow:ellipsis}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:22px 16px}
+:root[data-theme="dark"] header{background:#1d2c46;color:#e6ebf2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header{background:#1d2c46;color:#e6ebf2}}
+header .wrap{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+header h1{margin:0;font-size:1.45rem;line-height:1.25}
+header p{margin:.35rem 0 0;opacity:.9;max-width:62ch}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+main.wrap{padding-top:18px;padding-bottom:40px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;box-shadow:var(--shadow);margin-bottom:16px}
+h2{font-size:1.1rem;margin:0 0 .6rem;color:var(--navy)}
+h3{font-size:1rem;margin:1rem 0 .4rem;color:var(--navy)}
+label{display:block;font-weight:600;margin:.7rem 0 .2rem}
+.hint{color:var(--muted);font-size:.86rem;font-weight:400}
+input,select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);font-size:15px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.row3,.row2{grid-template-columns:1fr}.tabs button{font-size:.82rem}}
+button{cursor:pointer;border:0;border-radius:8px;padding:11px 16px;font-size:15px;font-weight:600}
+.primary{background:var(--blue);color:#fff;width:100%;margin-top:16px}
+:root[data-theme="dark"] .primary{color:#0f141b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .primary{color:#0f141b}}
+.ghost{background:transparent;color:var(--blue);border:1px solid var(--line)}
+.err{color:var(--red);font-weight:600;margin-top:8px;min-height:1.2em}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:.4rem 0 .8rem}
+@media (max-width:360px){.kpis{grid-template-columns:1fr}}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:9px;text-align:center}
+.kpi .v{font-size:1.35rem;font-weight:700}
+.kpi .l{font-size:.78rem;color:var(--muted)}
+.b{color:var(--blue)}.t{color:var(--grey)}.h{color:var(--red)}
+.stack{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.stack div{height:100%}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 5px;text-align:center}
+th{background:var(--blue-soft)}
+td:first-child,th:first-child{text-align:left}
+.muted{color:var(--muted)}
+details{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600;color:var(--navy)}
+code{background:var(--blue-soft);padding:1px 4px;border-radius:4px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal.open{display:flex}
+.modal .box{background:var(--card);color:var(--ink);max-width:640px;width:100%;max-height:90vh;overflow:auto;border-radius:12px;padding:20px;border-top:6px solid var(--blue)}
+.verdict{font-size:1.15rem;font-weight:700;margin:.2rem 0 .6rem}
+.quote{background:var(--blue-soft);border-radius:8px;padding:10px 12px;margin:.6rem 0}
+svg text{fill:var(--muted);font-size:11px}
+footer{color:var(--muted);font-size:.85rem;text-align:center;padding:20px 16px 30px}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs button{background:var(--blue-soft);color:var(--navy);padding:7px 12px;font-size:.9rem}
+.tabs button.on{background:var(--blue);color:#fff}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div>
+    <h1>Bayesian Reading of Hazard Ratios</h1>
+    <p>Turn the hazard ratio and 95% confidence interval from TriNetX, or any observational study, into the probability that the effect is large enough to matter, after allowing for bias.</p>
+  </div>
+  <button class="ghost" id="themeBtn" aria-label="Toggle dark mode" style="color:inherit;border-color:rgba(255,255,255,.4)">◐</button>
+</div></header>
+
+<main class="wrap">
+<div class="grid">
+<section class="card" aria-labelledby="inTitle">
+  <h2 id="inTitle">1. Enter the study result</h2>
+  <div class="tabs" role="group" aria-label="Examples">
+    <span class="muted" style="align-self:center;font-size:.85rem">Try an example:</span>
+    <button type="button" data-ex="1">Small effect, big cohort</button>
+    <button type="button" data-ex="2">Moderate effect</button>
+    <button type="button" data-ex="3">Not significant</button>
+  </div>
+  <label for="meas">Effect measure</label>
+  <select id="meas"><option value="HR" selected>Hazard ratio (HR)</option><option value="RR">Risk ratio (RR)</option></select>
+  <div class="row3">
+    <div><label for="hr" id="hrLab">Hazard ratio</label><input id="hr" type="number" step="0.01" min="0" value="0.95" inputmode="decimal"></div>
+    <div><label for="lo">95% CI lower</label><input id="lo" type="number" step="0.01" min="0" value="0.92" inputmode="decimal"></div>
+    <div><label for="hi">95% CI upper</label><input id="hi" type="number" step="0.01" min="0" value="0.98" inputmode="decimal"></div>
+  </div>
+  <p class="hint">Enter the ratio and its 95% CI as reported. A ratio below 1 is assumed to favor the treatment.</p>
+
+  <label for="p0">Risk in the comparator group (%) <span class="hint">optional, for events per 1,000</span></label>
+  <div class="row2">
+    <input id="p0" type="number" step="0.1" min="0" max="99" value="10" inputmode="decimal">
+    <input id="tlab" type="text" value="one year" aria-label="Time point for the comparator risk">
+  </div>
+
+  <h2 style="margin-top:18px">2. Choose the clinical thresholds</h2>
+  <div class="row2">
+    <div><label for="mcid">Meaningful benefit if <span class="mA">HR</span> below</label><input id="mcid" type="number" step="0.01" min="0.01" max="0.999" value="0.90" inputmode="decimal"></div>
+    <div><label for="harm">Meaningful harm if <span class="mA">HR</span> above</label><input id="harm" type="number" step="0.01" min="1.001" value="1.11" inputmode="decimal"></div>
+  </div>
+  <p class="hint">Choose these before looking at the result. 0.90 means a 10% lower hazard. The harm threshold defaults to 1 divided by the benefit threshold.</p>
+
+  <h2 style="margin-top:18px">3. Choose the assumptions</h2>
+  <label for="sb">Allowance for systematic error (bias) <span class="hint">SD on the log <span class="mA">HR</span> scale</span></label>
+  <select id="sb">
+    <option value="0">0 (no allowance: random error only)</option>
+    <option value="0.05">0.05 (small: bias up to about ±10%)</option>
+    <option value="0.10" selected>0.10 (moderate: bias up to about ±20%)</option>
+    <option value="0.20">0.20 (large: bias up to about ±40%)</option>
+    <option value="custom">Custom…</option>
+  </select>
+  <input id="sbc" type="number" step="0.01" min="0" value="0.15" style="display:none;margin-top:6px" aria-label="Custom systematic error SD">
+
+  <label for="prior">Prior <span class="hint">what was expected before the study</span></label>
+  <select id="prior">
+    <option value="skeptical" selected>Skeptical (recommended): centered on no effect</option>
+    <option value="weak">Weakly informative: very wide, data dominate</option>
+    <option value="enthusiastic">Enthusiastic: expects a 20% lower hazard</option>
+    <option value="custom">Custom…</option>
+  </select>
+  <div class="row2" id="pcust" style="display:none;margin-top:6px">
+    <input id="pm" type="number" step="0.01" min="0.01" value="1.00" aria-label="Prior center as HR">
+    <input id="ps" type="number" step="0.01" min="0.01" value="0.136" aria-label="Prior SD on log scale">
+  </div>
+  <button class="primary" id="go">Calculate and interpret</button>
+  <div class="err" id="err" role="alert"></div>
+</section>
+
+<section class="card" aria-labelledby="outTitle" id="results">
+  <h2 id="outTitle">Results</h2>
+  <p class="muted" id="placeholder">Enter a result and press <b>Calculate and interpret</b>.</p>
+  <div id="out" style="display:none">
+    <p style="margin:.1rem 0"><b>Reported:</b> <span id="rep"></span></p>
+    <p style="margin:.1rem 0"><b>Bayesian estimate (posterior median):</b> <span id="post"></span></p>
+    <div class="kpis">
+      <div class="kpi"><div class="v b" id="kBen"></div><div class="l">Meaningful benefit</div></div>
+      <div class="kpi"><div class="v t" id="kTri"></div><div class="l">Too small to matter</div></div>
+      <div class="kpi"><div class="v h" id="kHarm"></div><div class="l">Meaningful harm</div></div>
+    </div>
+    <div class="stack" aria-hidden="true"><div id="sBen" style="background:var(--blue)"></div><div id="sTri" style="background:var(--grey)"></div><div id="sHarm" style="background:var(--red)"></div></div>
+    <p class="hint" style="margin:.35rem 0 0">The three probabilities above add up to 100%. Probability of any benefit (<span class="mA">HR</span> &lt; 1): <b id="kAny"></b>; this overlaps the categories above.</p>
+    <p id="abs" style="margin:.7rem 0 .3rem"></p>
+    <svg id="plot" viewBox="0 0 460 200" width="100%" role="img" aria-label="Posterior distribution of the hazard ratio"></svg>
+    <h3>How much does the bias assumption matter?</h3>
+    <table id="sens"><thead><tr><th>Systematic error SD</th><th>Posterior median <span class="mA">HR</span> (95% CrI)</th><th>Benefit</th><th>Too small</th><th>Harm</th></tr></thead><tbody></tbody></table>
+    <button class="ghost" id="reopen" style="margin-top:12px;width:100%">Show interpretation again</button>
+  </div>
+</section>
+</div>
+
+<section class="card" aria-labelledby="guideTitle">
+  <h2 id="guideTitle">Guide</h2>
+  <details open><summary>Why this tool exists</summary>
+    <p>Large health record networks such as TriNetX compare tens of thousands of patients. In samples this size, a tiny difference, for example a hazard ratio of 0.95, becomes statistically significant (P &lt; 0.05). A small P value means the result would be unusual if the true hazard ratio were 1.00. It does not say whether the effect is large enough to change practice.</p>
+    <p>The confidence interval has a second blind spot. It reflects random error only, which shrinks as cohorts grow. It ignores systematic error from residual confounding or misclassified outcomes, which does not shrink. A very narrow interval can therefore look far more certain than it is.</p>
+    <p>This calculator answers the question clinicians actually ask: <b>how likely is it that the treatment lowers risk by an amount worth acting on, given that the study may be biased?</b></p>
+  </details>
+  <details><summary>How it works, in diagnostic-test terms</summary>
+    <p>Think of a pretest probability, a test result, and a post-test probability. Here the <b>prior</b> is the pretest probability (what was expected before the study), the TriNetX hazard ratio is the test result, and the <b>posterior</b> is the post-test probability. The calculator also widens the study's uncertainty by the bias allowance you choose, because bias does not get smaller in larger cohorts.</p>
+    <p>Calculation: SE = [ln(upper) − ln(lower)] / 3.92. Total variance = SE² + bias SD². With a normal prior on ln(HR), the posterior is normal with variance 1 / (1/prior SD² + 1/total variance) and mean equal to that variance × (prior mean / prior SD² + ln(HR) / total variance). Probabilities are areas of this posterior below, between, and above the thresholds. The default harm threshold is exactly 1 divided by the benefit threshold (1/0.90, shown as 1.11). For a hazard ratio, absolute risk uses 1 − (1 − comparator risk)<sup>HR</sup> under proportional hazards; for a risk ratio, it uses comparator risk × RR, capped at 100%. Both are applied to the reported ratio and, for the Bayesian estimate, to the posterior median and credible limits.</p>
+  </details>
+  <details><summary>How to use it, step by step</summary>
+    <ol>
+      <li>Copy the hazard ratio and its 95% confidence interval from the TriNetX output (Compare Outcomes, Hazard Ratio panel), or from any paper.</li>
+      <li>Enter the risk in the comparator group at the same time point (the Kaplan–Meier or risk estimate), if you want events per 1,000 patients.</li>
+      <li>Set the smallest benefit that would matter for this outcome. Decide this <b>before</b> looking at the result.</li>
+      <li>Choose a bias allowance. This is a sensitivity setting, not an estimate of the bias in your study; 0.10 is a reasonable starting point for a propensity-matched observational study. Look at the sensitivity table to see how much the answer depends on it.</li>
+      <li>Keep the skeptical prior unless you have a clear reason. Compare with the weakly informative prior to check that the conclusion does not depend on the prior.</li>
+      <li>Press <b>Calculate and interpret</b>. Copy the suggested sentence into your Results section and report your assumptions.</li>
+    </ol>
+  </details>
+  <details><summary>Key terms</summary>
+    <p><b>Meaningful benefit:</b> a reduction large enough to change practice. <b>Too small to matter:</b> effects between the benefit and harm thresholds. <b>Posterior median HR:</b> the middle value of the updated distribution; half the plausible values lie on each side. <b>Credible interval (CrI):</b> the range containing the true effect with 95% probability, given the assumptions. <b>Systematic error:</b> error from confounding, selection, or misclassification that more patients cannot fix.</p>
+  </details>
+  <details><summary>Limitations</summary>
+    <p>Results depend on the stated assumptions. The bias allowance is centered on zero; if bias is known to favor one group, the calculator cannot correct its direction. The normal approximation is less accurate when events are few. The events per 1,000 assume proportional hazards. A single observational study can rarely establish a meaningful benefit with high probability once bias is allowed for; consistent results from several designs are more convincing.</p>
+  </details>
+  <p class="hint" style="margin-top:12px">Free to use, no data leave your browser. Not affiliated with or endorsed by TriNetX, LLC. Accompanies the article “Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator” (in submission). Code released under the MIT License: <a href="https://github.com/emantoraih/trinetx-bayes-calculator">source code</a>. Version 1.0, November 2026.</p>
+</section>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="box">
+    <h2 id="mTitle">Interpretation</h2>
+    <div class="verdict" id="mVerdict"></div>
+    <div id="mBody"></div>
+    <h3>Suggested sentence for your Results</h3>
+    <div class="quote" id="mQuote"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="primary" id="copy" style="width:auto;margin-top:6px">Copy sentence</button>
+      <button class="ghost" id="close" style="margin-top:6px">Close</button>
+    </div>
+  </div>
+</div>
+
+<script id="core">
+// ---------- core maths (tested) ----------
+function Phi(z){ // high-accuracy normal CDF (Cody-style via complementary series)
+  if(z<-8)return 0; if(z>8)return 1;
+  let sum=z,val=z;for(let i=1;i<200;i++){val*=z*z/(2*i+1);sum+=val;if(Math.abs(val)<1e-16)break;}
+  return 0.5+(sum/Math.sqrt(2*Math.PI))*Math.exp(-z*z/2);}
+function bayesHR(o){ // o: hr, lo, hi, sb, pm (HR), ps (log SD), mcid, harm
+  const y=Math.log(o.hr), se=(Math.log(o.hi)-Math.log(o.lo))/3.92;
+  const s2=se*se+o.sb*o.sb, m0=Math.log(o.pm), v=1/(1/(o.ps*o.ps)+1/s2), m=v*(m0/(o.ps*o.ps)+y/s2), sd=Math.sqrt(v);
+  const pAny=Phi(-m/sd), pBen=Phi((Math.log(o.mcid)-m)/sd), pHarm=1-Phi((Math.log(o.harm)-m)/sd);
+  const p=2*(1-Phi(Math.abs(y/se)));
+  return {y,se,m,sd,postHR:Math.exp(m),crLo:Math.exp(m-1.959964*sd),crHi:Math.exp(m+1.959964*sd),pAny,pBen,pTri:1-pBen-pHarm,pHarm,p};}
+function riskT(p0,hr,meas){return meas==="RR"?p0*hr:1-Math.pow(1-p0,hr);}
+// RR mode: a treated risk p0 x RR above 100% is impossible, so the absolute effect is withheld
+function absOK(o,r){return !(o.p0&&o.meas==="RR"&&o.p0*Math.max(o.hr,r.crHi)>1);}
+const RRMSG="The absolute effect is not shown: with this comparator risk, the risk ratio (or its upper credible limit) implies a treated risk above 100%. Check the comparator risk and the risk ratio.";
+</script>
+<script>
+const $=id=>document.getElementById(id);
+const PRIORS={skeptical:[1,0.136],weak:[1,1.0],enthusiastic:[0.80,0.136]};
+const EX={1:[0.95,0.92,0.98,10],2:[0.88,0.80,0.97,10],3:[0.90,0.78,1.04,10]};
+const pct=x=>{const v=100*x;return v<0.1?"<0.1%":v>99.9?">99.9%":(v<10?v.toFixed(1):v.toFixed(0))+"%";};
+const f2=x=>x.toFixed(2);
+function fmtP(p){return p<0.001?"P<0.001":"P="+(p<0.01?p.toFixed(3):p.toFixed(2));}
+
+// theme
+(function(){try{const t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}})();
+$("themeBtn").onclick=()=>{const cur=document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  const nx=cur==="dark"?"light":"dark";document.documentElement.dataset.theme=nx;try{localStorage.setItem("theme",nx);}catch(e){}};
+
+$("meas").onchange=()=>{const m=$("meas").value;document.querySelectorAll(".mA").forEach(e=>e.textContent=m);$("hrLab").textContent=m==="HR"?"Hazard ratio":"Risk ratio";};
+$("sb").onchange=()=>{$("sbc").style.display=$("sb").value==="custom"?"block":"none";};
+$("prior").onchange=()=>{$("pcust").style.display=$("prior").value==="custom"?"grid":"none";};
+$("mcid").onchange=()=>{const v=parseFloat($("mcid").value);if(v>0&&v<1)$("harm").value=(1/v).toFixed(2);};
+document.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{const e=EX[b.dataset.ex];$("hr").value=e[0];$("lo").value=e[1];$("hi").value=e[2];$("p0").value=e[3];run();});
+
+function read(){
+  const hr=+$("hr").value,lo=+$("lo").value,hi=+$("hi").value,mcid=+$("mcid").value;
+  let harm=+$("harm").value; if(mcid>0&&mcid<1&&$("harm").value.trim()===(1/mcid).toFixed(2))harm=1/mcid; // exact reciprocal when the default is shown
+  const sb=$("sb").value==="custom"?+$("sbc").value:+$("sb").value;
+  let pm,ps; if($("prior").value==="custom"){pm=+$("pm").value;ps=+$("ps").value;}else{[pm,ps]=PRIORS[$("prior").value];}
+  const p0raw=$("p0").value.trim(); const p0=p0raw===""?null:+p0raw/100;
+  if(!(hr>0&&lo>0&&hi>0))throw "Enter a hazard ratio and both confidence limits (all above 0).";
+  if(!(lo<hr&&hr<hi))throw "The hazard ratio must lie between the lower and upper confidence limits.";
+  if(!(mcid>0&&mcid<1))throw "The benefit threshold must be between 0 and 1 (for example 0.90).";
+  if(!(harm>1))throw "The harm threshold must be above 1 (for example 1.11).";
+  if(!(sb>=0&&sb<=1))throw "The bias allowance must be between 0 and 1.";
+  if(!(pm>0&&ps>0))throw "The custom prior needs a center above 0 and an SD above 0.";
+  if(p0!==null&&!(p0>0&&p0<1))throw "Comparator risk must be between 0 and 100%.";
+  const meas=$("meas").value;
+  return {hr,lo,hi,mcid,harm,sb,pm,ps,p0,meas,word:meas==="HR"?"hazard":"risk",name:meas==="HR"?"hazard ratio":"risk ratio",tlab:$("tlab").value||"the time point"};
+}
+
+let last=null;
+function run(){
+  $("err").textContent="";
+  let o;try{o=read();}catch(e){$("err").textContent=e;return;}
+  const r=bayesHR(o);last={o,r};
+  const asym=Math.abs(Math.log(o.hr)-(Math.log(o.lo)+Math.log(o.hi))/2)/((Math.log(o.hi)-Math.log(o.lo))/2);
+  $("err").textContent=asym>0.10?"Check the input: the hazard ratio is not centered in its interval on the log scale. The method assumes a 95% interval calculated on the log scale; small differences from rounding are expected.":"";
+  $("placeholder").style.display="none";$("out").style.display="block";
+  $("rep").textContent=`${o.meas} ${f2(o.hr)} (95% CI ${f2(o.lo)}–${f2(o.hi)}); approximate Wald ${fmtP(r.p)}, recalculated from the interval`;
+  $("post").textContent=`${o.meas} ${f2(r.postHR)} (95% CrI ${f2(r.crLo)}–${f2(r.crHi)}), bias SD ${o.sb.toFixed(2)}`;
+  $("kAny").textContent=pct(r.pAny);$("kBen").textContent=pct(r.pBen);$("kTri").textContent=pct(r.pTri);$("kHarm").textContent=pct(r.pHarm);
+  $("sBen").style.width=100*r.pBen+"%";$("sTri").style.width=100*r.pTri+"%";$("sHarm").style.width=100*r.pHarm+"%";
+  if(o.p0&&!absOK(o,r))$("abs").textContent=RRMSG;
+  else if(o.p0){const d=1000*(o.p0-riskT(o.p0,o.hr,o.meas)),dm=1000*(o.p0-riskT(o.p0,r.postHR,o.meas)),dl=1000*(o.p0-riskT(o.p0,r.crHi,o.meas)),dh=1000*(o.p0-riskT(o.p0,r.crLo,o.meas));
+    $("abs").innerHTML=`<b>Absolute effect at ${o.tlab}:</b> from the reported ${o.meas}, ${absTxt(d)} events per 1,000 patients. Bayesian estimate (posterior median ${o.meas}), ${absTxt(dm)} per 1,000 (95% CrI from ${absTxt(dl)} to ${absTxt(dh)}), given the comparator risk entered.`;}
+  else $("abs").textContent="Enter the comparator risk to see events per 1,000 patients.";
+  drawPlot(o,r);
+  const tb=$("sens").querySelector("tbody");tb.innerHTML="";
+  [0,0.05,0.10,0.20].forEach(s=>{const q=bayesHR({...o,sb:s});
+    tb.insertAdjacentHTML("beforeend",`<tr${Math.abs(s-o.sb)<1e-9?' style="font-weight:700"':''}><td>${s.toFixed(2)}</td><td>${f2(q.postHR)} (${f2(q.crLo)}–${f2(q.crHi)})</td><td class="b">${pct(q.pBen)}</td><td class="t">${pct(q.pTri)}</td><td class="h">${pct(q.pHarm)}</td></tr>`);});
+  interpret(o,r);
+}
+
+function absTxt(v){return Math.abs(v)<0.05?"no difference":`${Math.abs(v).toFixed(1)} ${v>0?"fewer":"more"}`;}
+function drawPlot(o,r){
+  const W=460,H=200,L=30,Rr=10,T=8,B=60;
+  const xmin=Math.log(Math.min(0.6,r.crLo*0.95,o.mcid*0.9)),xmax=Math.log(Math.max(1.5,r.crHi*1.05,o.harm*1.1));
+  const X=v=>L+(v-xmin)/(xmax-xmin)*(W-L-Rr), base=H-B;
+  const Y=v=>T+(base-T)*(1-Math.exp(-0.5*((v-r.m)/r.sd)**2));
+  const n=240;
+  const area=(a,b,col,op)=>{a=Math.max(a,xmin);b=Math.min(b,xmax);if(b<=a)return"";let p=[];
+    for(let i=0;i<=n;i++){const v=a+(b-a)*i/n;p.push(X(v).toFixed(1)+","+Y(v).toFixed(1));}
+    return `<path d="M${X(a).toFixed(1)},${base} L${p.join(" L")} L${X(b).toFixed(1)},${base} Z" fill="${col}" opacity="${op}"/>`;};
+  const lm=Math.log(o.mcid),lh=Math.log(o.harm);
+  let s=area(xmin,lm,"var(--blue)",.45)+area(lm,lh,"var(--grey)",.35)+area(lh,xmax,"var(--red)",.4);
+  let path="";for(let i=0;i<=n;i++){const v=xmin+(xmax-xmin)*i/n;path+=(i?"L":"M")+X(v).toFixed(1)+","+Y(v).toFixed(1);}
+  s+=`<path d="${path}" fill="none" stroke="var(--ink)" stroke-width="1.6"/>`;
+  s+=`<line x1="${L}" x2="${W-Rr}" y1="${base}" y2="${base}" stroke="var(--line)"/>`;
+  [o.mcid,1,o.harm].forEach(v=>{const x=X(Math.log(v));s+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${base}" stroke="var(--muted)" stroke-dasharray="3 3"/>`;});
+  [0.6,0.7,0.8,0.9,1.0,1.1,1.25,1.5].filter(t=>Math.log(t)>=xmin&&Math.log(t)<=xmax)
+    .forEach(t=>{s+=`<text x="${X(Math.log(t))}" y="${base+14}" text-anchor="middle">${t}</text>`;});
+  s+=`<text x="${W/2}" y="${base+30}" text-anchor="middle">${o.name[0].toUpperCase()+o.name.slice(1)} (dashed lines: ${f2(o.mcid)}, 1.00, ${f2(o.harm)})</text>`;
+  const leg=[["var(--blue)",.45,"Meaningful benefit"],["var(--grey)",.35,"Too small to matter"],["var(--red)",.4,"Meaningful harm"]];
+  let lx=[40,180,330];
+  leg.forEach(([c,op,t],k)=>{s+=`<rect x="${lx[k]}" y="${base+42}" width="11" height="11" rx="2" fill="${c}" opacity="${op+.2}"/><text x="${lx[k]+16}" y="${base+52}">${t}</text>`;});
+  $("plot").innerHTML=s;
+}
+
+function interpret(o,r){
+  const sig=r.p<0.05&&o.hr<1, ben=r.pBen, tri=r.pTri, harm=r.pHarm;
+  let v,col;
+  if(ben>=0.80){v="A clinically meaningful benefit is likely.";col="var(--green)";}
+  else if(ben>=0.50){v="A meaningful benefit is more likely than not, but far from certain.";col="var(--blue)";}
+  else if(tri>=0.60){v=sig?"Statistically significant, but probably too small to matter.":"The effect is probably too small to matter.";col="var(--muted)";}
+  else if(harm>=0.30){v="Meaningful harm cannot be ruled out.";col="var(--red)";}
+  else {v="The result is uncertain: benefit, an effect too small to matter, and harm all remain possible.";col="var(--muted)";}
+  $("mVerdict").textContent=v;$("mVerdict").style.color=col;
+  const b0=bayesHR({...o,sb:0});
+  const pn={skeptical:"skeptical",weak:"weakly informative",enthusiastic:"enthusiastic",custom:"custom"}[$("prior").value];
+  let html=`<p class="muted">Under the selected assumptions: ${pn} prior${pn==="skeptical"?" (the default)":" (the default is skeptical)"} and a bias SD of ${o.sb.toFixed(2)}, which is a sensitivity setting, not a measured amount of bias.</p><p>The reported result was ${o.meas} ${f2(o.hr)} (95% CI ${f2(o.lo)}–${f2(o.hi)}; approximate ${fmtP(r.p)}, recalculated from the interval). `;
+  html+= sig?`By the usual P&nbsp;&lt;&nbsp;0.05 rule this would be called a significant benefit. `:(r.p<0.05&&o.hr>1)?`By the usual P&nbsp;&lt;&nbsp;0.05 rule this would be called significant harm. `:`By the usual P&nbsp;&lt;&nbsp;0.05 rule this would be called non-significant, which does <b>not</b> mean there is no effect. `;
+  html+=`After allowing for systematic error (SD ${o.sb.toFixed(2)}) and using the chosen prior, there is a <b>${pct(ben)}</b> probability that the ${o.word} is reduced by more than ${Math.round(100*(1-o.mcid))}% (${o.meas} below ${f2(o.mcid)}), a <b>${pct(tri)}</b> probability that the effect is too small to matter, and a <b>${pct(harm)}</b> probability of meaningful harm.</p>`;
+  if(o.p0&&!absOK(o,r))html+=`<p>${RRMSG}</p>`;
+  else if(o.p0){const d=1000*(o.p0-riskT(o.p0,o.hr,o.meas));html+=`<p>In absolute terms, with a comparator risk of ${(100*o.p0).toFixed(1)}% at ${o.tlab}, the reported ${o.meas} corresponds to about <b>${absTxt(d)} events per 1,000 patients</b>. The Bayesian estimate is ${absTxt(1000*(o.p0-riskT(o.p0,r.postHR,o.meas)))} per 1,000 (95% CrI from ${absTxt(1000*(o.p0-riskT(o.p0,r.crHi,o.meas)))} to ${absTxt(1000*(o.p0-riskT(o.p0,r.crLo,o.meas)))}).</p>`;}
+  if(o.sb>0&&Math.abs(b0.pBen-ben)>0.05)html+=`<p>Without any allowance for bias, the probability of meaningful benefit would be ${pct(b0.pBen)}. The difference shows how much the conclusion depends on how much you trust the study design.</p>`;
+  if(o.sb>=0.1&&ben<0.80)html+=`<p class="muted">Note: with a bias allowance of ${o.sb.toFixed(2)}, even a very large study can rarely reach a high probability of meaningful benefit. Bias, not sample size, limits the certainty of a single observational study.</p>`;
+  $("mBody").innerHTML=html;
+  const q=`The ${o.name} was ${f2(o.hr)} (95% CI ${f2(o.lo)}–${f2(o.hi)})${o.p0&&absOK(o,r)?`, corresponding to ${absTxt(1000*(o.p0-riskT(o.p0,o.hr,o.meas)))} events per 1,000 patients at ${o.tlab}`:""}. In a Bayesian analysis with a ${pn} prior and an allowance for systematic error (SD ${o.sb.toFixed(2)} on the log ${o.name} scale), the posterior median ${o.meas} was ${f2(r.postHR)} (95% CrI ${f2(r.crLo)}–${f2(r.crHi)}), the probability of a clinically meaningful benefit (${o.meas} < ${f2(o.mcid)}) was ${pct(ben)}, the probability that the effect was too small to matter was ${pct(tri)}, and the probability of meaningful harm (${o.meas} > ${f2(o.harm)}) was ${pct(harm)}.`;
+  $("mQuote").textContent=q;
+  $("modal").classList.add("open");$("close").focus();
+}
+$("go").onclick=run;
+if(location.hash==="#demo")run();
+$("reopen").onclick=()=>{if(last)$("modal").classList.add("open");};
+$("close").onclick=()=>$("modal").classList.remove("open");
+$("modal").onclick=e=>{if(e.target.id==="modal")$("modal").classList.remove("open");};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("modal").classList.remove("open");});
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText($("mQuote").textContent);$("copy").textContent="Copied";setTimeout(()=>$("copy").textContent="Copy sentence",1500);}catch(e){$("copy").textContent="Select and copy manually";}};
+</script>
+</body>
+</html>

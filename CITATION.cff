@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this calculator or code, please cite it as below."
+title: "Bayesian Reading of Hazard Ratios: calculator and simulation code"
+version: "1.0"
+date-released: "2026-11-13"
+license: MIT
+repository-code: "https://github.com/emantoraih/trinetx-bayes-calculator"
+url: "https://emantoraih.github.io/trinetx-bayes-calculator/"
+authors:
+  - family-names: Toraih
+    given-names: Eman A.
+  - family-names: Hussein
+    given-names: Mohammad H.
+  - family-names: Jishu
+    given-names: Jessan A.
+  - family-names: Fawzy
+    given-names: Manal S.
+keywords:
+  - Bayesian analysis
+  - hazard ratio
+  - TriNetX
+  - systematic error
+  - clinical significance
