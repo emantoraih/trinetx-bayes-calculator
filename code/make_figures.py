@@ -180,7 +180,7 @@ def box(x, y, w, h, fc=LB, ec="none", r=0.3):
 def arrow(x0, x1, y):
     ax.annotate("", xy=(x1, y), xytext=(x0, y), arrowprops=dict(arrowstyle="-|>", color=GR, lw=1.2, mutation_scale=12))
 cols = [(0.3, "1  Set the truth", "720 scenarios"), (7.75, "2  Simulate studies", "10,000 per scenario"),
-        (15.2, "3  Apply the five rules", "to every simulated study"), (22.65, "4  Score against the truth", "known because it was set")]
+        (15.2, "3  Apply the five rules", "to every simulated study"), (22.65, "4  Score each decision", "4 threshold rules vs true HR")]
 for x, t, s in cols:
     box(x, 14.9, 7.05, 2.0, fc=NV)
     ax.text(x + 0.35, 16.25, t, color="white", fontsize=9.5, fontweight="bold", va="center")
@@ -223,7 +223,7 @@ ex_st = np.sqrt(se ** 2 + 0.10 ** 2); ex_ba = np.exp(np.log(0.877) + 1.96 * ex_s
 ex_s2 = se ** 2 + 0.10 ** 2; ex_v = 1 / (1 / 0.136 ** 2 + 1 / ex_s2); ex_m = ex_v * np.log(0.877) / ex_s2
 from math import erf
 ex_pb = 0.5 * (1 + erf((np.log(0.90) - ex_m) / np.sqrt(ex_v) / np.sqrt(2)))
-verdicts = ["Yes: P<0.001", f"No: upper {np.exp(np.log(0.877) + 1.96 * se):.3f}", f"No: upper {ex_ba:.2f}", f"No: P={100 * ex_pb:.0f}%", f"No: P={100 * ex_pb:.0f}%"]
+verdicts = ["Yes: P<0.001", f"No: upper {np.exp(np.log(0.877) + 1.96 * se):.3f}", f"No: upper {ex_ba:.2f}", f"No: {100 * ex_pb:.0f}%", f"No: {100 * ex_pb:.0f}%"]
 rules = [("P<0.05 with HR<1", "#7F7F7F", "HR<1.00"),
          ("Upper 95% CI <0.90", "#ED7D31", "HR<0.90"),
          ("Bias-aware CI: upper <0.90", "#BF9000", "HR<0.90"),
@@ -231,26 +231,28 @@ rules = [("P<0.05 with HR<1", "#7F7F7F", "HR<1.00"),
          ("Bayes P(HR<0.90) >0.80", "#70AD47", "HR<0.90")]
 ax.text(15.5, 13.95, "Example study: HR 0.877", fontsize=7.6, color="#C00000", fontweight="bold", va="center")
 ax.text(15.5, 13.35, f"(95% CI {ex_lo:.3f}–{ex_hi:.3f}); true HR 0.95", fontsize=6.9, color=GR, va="center")
+ax.text(15.5, 12.75, f"Posterior P(HR<0.90) = {100 * ex_pb:.0f}%", fontsize=6.9, color=GR, va="center")
+ax.text(15.5, 12.15, "(skeptical prior, assumed bias SD 0.10)", fontsize=6.9, color=GR, va="center")
 for i, (r, c, tg) in enumerate(rules):
-    y = 12.05 - i * 2.15
+    y = 10.95 - i * 2.0
     box(15.5, y - 0.85, 6.45, 1.75, fc="white", ec="#C9D6EC")
     ax.add_patch(Rectangle((15.5, y - 0.85), 0.28, 1.75, fc=c, ec="none"))
     ax.text(16.05, y + 0.3, r, fontsize=7.6, fontweight="bold", color=NV, va="center")
     ax.text(16.05, y - 0.4, "Target: " + tg, fontsize=6.8, color=GR, va="center")
     ax.text(21.8, y - 0.4, verdicts[i], fontsize=6.8, fontweight="bold", color=BL if verdicts[i].startswith("Yes") else GR, va="center", ha="right")
-ax.text(15.5, 1.25, "Assumed bias SD (0, 0.05, 0.10,\n0.20) and prior varied separately\nfrom the true pattern", fontsize=6.6, color=GR, va="center", linespacing=1.2)
+ax.text(15.5, 1.05, "Assumed bias SD (0, 0.05, 0.10,\n0.20) and prior varied separately\nfrom the true pattern", fontsize=6.6, color=GR, va="center", linespacing=1.2)
 # panel 4: scoring
 box(22.95, 9.35, 6.45, 4.6, fc="white", ec="#C9D6EC")
 ax.text(23.3, 13.25, "True HR below 0.90", fontsize=8, fontweight="bold", color="#0f7563", va="center")
-ax.text(23.3, 12.3, "A declaration of benefit is a", fontsize=7.3, color=GR, va="center")
-ax.text(23.3, 11.5, "correct detection", fontsize=8.5, fontweight="bold", color="#0f7563", va="center")
+ax.text(23.3, 12.25, "A declaration of meaningful\nbenefit is a", fontsize=7.3, linespacing=1.15, color=GR, va="center")
+ax.text(23.3, 11.15, "correct detection", fontsize=8.5, fontweight="bold", color="#0f7563", va="center")
 ax.text(23.3, 10.3, "(higher is better)", fontsize=7, color=GR, va="center")
 box(22.95, 4.35, 6.45, 4.6, fc="white", ec="#C9D6EC")
 ax.text(23.3, 8.25, "True HR 0.90 or higher", fontsize=8, fontweight="bold", color="#C00000", va="center")
-ax.text(23.3, 7.3, "A declaration of benefit is a", fontsize=7.3, color=GR, va="center")
-ax.text(23.3, 6.5, "false claim", fontsize=8.5, fontweight="bold", color="#C00000", va="center")
-ax.text(23.3, 5.85, "(lower is better)", fontsize=7, color=GR, va="center")
-ax.text(23.3, 4.95, "Example study (true HR 0.95): the\nfour No decisions avoid a false claim", fontsize=6.6, color="#C00000", va="center", linespacing=1.15)
+ax.text(23.3, 7.25, "A declaration of meaningful\nbenefit is a", fontsize=7.3, linespacing=1.15, color=GR, va="center")
+ax.text(23.3, 6.3, "false claim", fontsize=8.5, fontweight="bold", color="#C00000", va="center")
+ax.text(23.3, 5.6, "(lower is better)", fontsize=7, color=GR, va="center")
+ax.text(23.3, 4.85, "Example study (true HR 0.95): the\nfour No decisions avoid a false claim", fontsize=6.6, color="#C00000", va="center", linespacing=1.15)
 ax.text(23.0, 2.75, "Reported per scenario:\n% of studies declaring benefit\nand 95% interval coverage", fontsize=7.3, color=NV, va="center", linespacing=1.3)
 ax.text(23.0, 0.95, "P<0.05 is a reference for current\npractice, not scored against 0.90", fontsize=6.6, color=GR, va="center", linespacing=1.2)
 save(fig, "Supplementary_Figure_S2", facecolor="white")
