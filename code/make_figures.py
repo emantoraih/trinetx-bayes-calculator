@@ -145,12 +145,18 @@ ax.add_patch(Rectangle((1.3, 4.95), 4.1 * 0.952, 0.3, fc=BLUE)); T(6.9, 5.1, "95
 T(1.3, 4.0, "4.8 fewer events per 1,000", fontsize=11.5, fontweight="bold", color=BLUE)
 rbox(7.9, 3.4, 6.75, 7.9, "white")
 T(8.4, 10.6, "B  Bayesian interpretation", fontsize=12.5, fontweight="bold", color=NAVY)
-T(8.4, 9.45, "Combine the study estimate\nwith a skeptical prior.", fontsize=10.5, color=SLATE, linespacing=1.4)
-T(8.4, 7.95, "Allow for residual bias (SD 0.10) and\nestimate probabilities for clinically\ndefined effect sizes.", fontsize=10.5, color=SLATE, linespacing=1.4)
-rbox(8.35, 3.75, 5.85, 2.45, "#d9ebe6", r=0.2)
-T(8.75, 5.65, f"{100 * e['P(trivial, 0.90-1.11)']:.0f}%", fontsize=26, fontweight="bold", color=TEAL)
-T(8.75, 4.75, "probability the effect is\ntoo small to matter", fontsize=9.5, fontweight="bold", color=TEAL, linespacing=1.3)
-T(8.75, 4.05, f"HR 0.90–1.11 · meaningful benefit {100 * e['P(meaningful benefit, HR<0.90)']:.0f}%", fontsize=8.8, color=TEAL)
+T(8.4, 9.55, "Skeptical prior + allowance for\nresidual bias (SD 0.10)", fontsize=10.5, color=SLATE, linespacing=1.4)
+T(8.4, 8.3, "Probability that the true effect is:", fontsize=10, fontweight="bold", color=NAVY)
+RED = "#9b3b2f"
+for k, (lab, col, colr) in enumerate([("Meaningful benefit (HR<0.90)", "P(meaningful benefit, HR<0.90)", BLUE),
+                                      ("Too small to matter (HR 0.90–1.11)", "P(trivial, 0.90-1.11)", TEAL),
+                                      ("Meaningful harm (HR>1.11)", "P(meaningful harm, HR>1.11)", RED)]):
+    yy = 7.6 - k * 1.15; v = 100 * e[col]
+    T(8.4, yy, lab, fontsize=9.5, color=SLATE)
+    ax.add_patch(Rectangle((8.4, yy - 0.62), 4.6, 0.32, fc="#e3e9ef"))
+    ax.add_patch(Rectangle((8.4, yy - 0.62), 4.6 * v / 100, 0.32, fc=colr))
+    T(14.25, yy - 0.46, f"{v:.0f}%" if v >= 10 else f"{v:.1f}%", fontsize=11, fontweight="bold", color=colr, ha="right")
+T(8.4, 3.9, "P=0.001, yet a meaningful\nbenefit is unlikely", fontsize=10, fontweight="bold", color=TEAL, linespacing=1.3)
 rbox(15.0, 3.4, 9.8, 7.9, "white")
 T(15.5, 10.6, "C  Simulation results", fontsize=12.5, fontweight="bold", color=NAVY)
 T(15.5, 9.75, "720 scenarios × 10,000 simulated studies", fontsize=10, color=SLATE)
@@ -160,7 +166,8 @@ for xx, t in cols3: T(xx, 8.3, t, fontsize=10, fontweight="bold", color=NAVY, ha
 for i, (hr, fc) in enumerate([(1.00, ROWA), (0.95, ROWA), (0.80, ROWB)]):
     y = 7.45 - i * 0.92
     ax.add_patch(Rectangle((15.35, y - 0.4), 9.1, 0.8, fc=fc, ec="none"))
-    T(15.6, y, f"True HR {hr:.2f}", fontsize=10, fontweight="bold", color=NAVY)
+    T(15.6, y + 0.15, f"True HR {hr:.2f}", fontsize=10, fontweight="bold", color=NAVY)
+    T(15.6, y - 0.22, "true benefit" if hr < 0.90 else "false claim", fontsize=7.5, color=MUTED)
     for (xx, _), c, colr in zip(cols3, ["CI upper <0.90", "Bias-aware CI upper <0.90, assumed bias SD 0.1", "Bayes P>0.95, assumed bias SD 0.1"], [NAVY, NAVY, TEAL]):
         T(xx, y, pc(g(hr, c)), fontsize=10, fontweight="bold", color=colr, ha="right")
 T(15.5, 4.45, "Percentage of studies declaring meaningful benefit", fontsize=9.5, color=SLATE)
