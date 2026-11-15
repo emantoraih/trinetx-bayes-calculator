@@ -4,12 +4,17 @@
 # Inputs (produced by Supplementary_Methods_S3_sim_v2.R): Simulation_v2_results.csv and Simulation_v2_results.xlsx
 # Usage: python make_figures.py [input folder] [output folder]
 # Tested with Python 3.13.9, pandas 2.3.3, numpy 2.3.5, matplotlib 3.10.6, openpyxl 3.1.5, Pillow 12.3.0.
-# Figures use Arial; output is PNG and LZW-compressed TIFF at 600 dpi.
+# Figures use Roboto (Google, Apache License 2.0; font files in ./fonts); output is PNG and LZW-compressed TIFF at 600 dpi.
 
 import sys, os
 import numpy as np, pandas as pd, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
+_FONTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
+if os.path.isdir(_FONTS):
+    for _f in os.listdir(_FONTS):
+        if _f.endswith(".ttf"): font_manager.fontManager.addfont(os.path.join(_FONTS, _f))
 from matplotlib.patches import FancyBboxPatch, Rectangle
 from PIL import Image
 
@@ -20,8 +25,8 @@ sim = pd.read_csv(os.path.join(IN, "Simulation_v2_results.csv"), keep_default_na
 ex = pd.read_excel(os.path.join(IN, "Simulation_v2_results.xlsx"), "Worked examples")
 ex = ex[ex.Prior == "Skeptical"]
 e1 = ex[ex.Example.str.startswith("1")].copy()
-BASE = {"font.family": "Arial", "mathtext.fontset": "custom", "mathtext.rm": "Arial",
-        "mathtext.it": "Arial:italic", "mathtext.bf": "Arial:bold", "mathtext.default": "regular"}
+BASE = {"font.family": "Roboto", "mathtext.fontset": "custom", "mathtext.rm": "Roboto",
+        "mathtext.it": "Roboto:italic", "mathtext.bf": "Roboto:bold", "mathtext.default": "regular"}
 
 
 def save(fig, name, **kw):
