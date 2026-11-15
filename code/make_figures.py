@@ -1,5 +1,6 @@
 # Paper 56 - Figures for "Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator"
-# Draws Figure 1, Figure 2, Supplementary Figures S1 and S2, and the graphical abstract.
+# Draws Figure 1, Figure 2, Supplementary Figures S1, S2 (simulation design), and S4 (all bias patterns), and the graphical abstract.
+# Supplementary Figure S3 is a screenshot of the online calculator, not drawn here.
 # Inputs (produced by Supplementary_Methods_S3_sim_v2.R): Simulation_v2_results.csv and Simulation_v2_results.xlsx
 # Usage: python make_figures.py [input folder] [output folder]
 # Tested with Python 3.13.9, pandas 2.3.3, numpy 2.3.5, matplotlib 3.10.6, openpyxl 3.1.5, Pillow 12.3.0.
@@ -95,7 +96,7 @@ ax.spines[["top", "right"]].set_visible(False)
 fig.tight_layout()
 save(fig, "Supplementary_Figure_S1", bbox_inches="tight")
 
-# ---------- Supplementary Figure S2: all patterns of systematic error ----------
+# ---------- Supplementary Figure S4: all patterns of systematic error ----------
 plt.rcParams.update({**BASE, "font.size": 8})
 pats = ["None", "Symmetric SD 0.05", "Symmetric SD 0.10", "Symmetric SD 0.20",
         "Directional favoring treatment, mean -0.05, SD 0.05", "Directional favoring treatment, mean -0.10, SD 0.05",
@@ -116,7 +117,7 @@ for j, (pt, pl) in enumerate(zip(pats, plab)):
 h, l = axs[0, 0].get_legend_handles_labels()
 fig.legend(h, l, loc="lower center", ncol=4, frameon=False, bbox_to_anchor=(0.5, -0.02))
 fig.tight_layout(rect=(0, 0.04, 1, 1))
-save(fig, "Supplementary_Figure_S2", bbox_inches="tight")
+save(fig, "Supplementary_Figure_S4", bbox_inches="tight")
 
 # ---------- Graphical abstract ----------
 plt.rcParams.update(BASE)
@@ -169,3 +170,87 @@ T(1.35, 2.38, "At these cutoffs, allowing for bias cut false claims but also det
 T(0.95, 1.15, "$^{1}$Upper 95% CI below 0.90      $^{2}$Upper limit of a 95% CI widened for bias (SD 0.10) below 0.90      $^{3}$Posterior probability of HR below 0.90 exceeds 95%", fontsize=8.2, color=MUTED)
 T(0.95, 0.6, "HR, hazard ratio; CI, confidence interval; SD, standard deviation on the log HR scale. Panels A and B show a hypothetical example.", fontsize=8.2, color=MUTED)
 save(fig, "Graphical_abstract", facecolor=BG)
+
+# ---------- Supplementary Figure S2: simulation design (histogram is an illustrative draw, not the stored simulation) ----------
+plt.rcParams.update({**BASE, "font.size": 8})
+NV, BL, LB, GR = "#1F3864", "#2F5597", "#DEE6F3", "#595959"
+fig = plt.figure(figsize=(7.5, 4.3)); ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 30); ax.set_ylim(0, 17.2); ax.axis("off")
+def box(x, y, w, h, fc=LB, ec="none", r=0.3):
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad=0,rounding_size={r}", fc=fc, ec=ec, lw=0.8))
+def arrow(x0, x1, y):
+    ax.annotate("", xy=(x1, y), xytext=(x0, y), arrowprops=dict(arrowstyle="-|>", color=GR, lw=1.2, mutation_scale=12))
+cols = [(0.3, "1  Set the truth", "720 scenarios"), (7.75, "2  Simulate studies", "10,000 per scenario"),
+        (15.2, "3  Apply the five rules", "to every simulated study"), (22.65, "4  Score against the truth", "known because it was set")]
+for x, t, s in cols:
+    box(x, 14.9, 7.05, 2.0, fc=NV)
+    ax.text(x + 0.35, 16.25, t, color="white", fontsize=9.5, fontweight="bold", va="center")
+    ax.text(x + 0.35, 15.45, s, color="#C9D6EC", fontsize=8, va="center")
+    box(x, 0.3, 7.05, 14.3, fc="#F4F7FB")
+for x0 in (7.35, 14.8, 22.25): arrow(x0 + 0.02, x0 + 0.38, 9.5)
+# panel 1: factors
+fac = [("True hazard ratio", "6", "0.80, 0.85, 0.90, 0.95, 1.00, 1.05"),
+       ("Patients per group", "5", "1,000 to 500,000"),
+       ("Comparator risk", "3", "1%, 5%, 20%"),
+       ("Systematic error", "8", "none, symmetric, directional,\nheavy-tailed patterns")]
+for i, (n, k, v) in enumerate(fac):
+    y = 12.6 - i * 2.75
+    box(0.6, y - 0.95, 6.45, 2.3, fc="white", ec="#C9D6EC")
+    ax.text(0.95, y + 0.72, n, fontsize=8, fontweight="bold", color=NV, va="center")
+    ax.text(0.95, y - 0.2, v, fontsize=7, color=GR, va="center", linespacing=1.15)
+    ax.text(6.7, y + 0.72, f"× {k}" if i else k, fontsize=11, fontweight="bold", color=BL, va="center", ha="right")
+box(0.6, 0.75, 6.45, 1.6, fc=BL)
+ax.text(3.83, 1.55, "6 × 5 × 3 × 8 = 720", color="white", fontsize=10.5, fontweight="bold", ha="center", va="center")
+# panel 2: model + example histogram
+ax.text(8.05, 13.75, "For one scenario, each study gives", fontsize=7.5, color=GR, va="center")
+ax.text(8.05, 12.95, "observed log HR =", fontsize=8, color=NV, fontweight="bold", va="center")
+ax.text(8.05, 12.1, "true log HR + systematic error\n+ sampling error", fontsize=8, color=NV, va="center", linespacing=1.2)
+ax.text(8.05, 10.45, "Example: true HR 0.95,\n100,000 patients per group,\ncomparator risk 5%, bias SD 0.10", fontsize=7, color=GR, va="center", linespacing=1.2)
+rng = np.random.default_rng(20261113)
+d0 = 1e5 * 0.05; d1 = 1e5 * (1 - 0.95 ** 0.95); se = np.sqrt(1 / d0 + 1 / d1)
+yv = np.exp(np.log(0.95) + rng.normal(0, 0.10, 10000) + rng.normal(0, se, 10000))
+ia = fig.add_axes([8.15 / 30, 1.6 / 17.2, 6.3 / 30, 6.9 / 17.2])
+ia.hist(yv, bins=np.linspace(0.6, 1.5, 46), color="#A9C3E8", edgecolor="white", linewidth=0.3)
+ia.axvline(0.95, color=NV, lw=1.2); ia.axvline(0.90, color="#C00000", lw=1, ls="--")
+ia.text(0.965, ia.get_ylim()[1] * 0.97, "true 0.95", fontsize=6.5, color=NV, va="top")
+ia.text(0.895, ia.get_ylim()[1] * 0.97, "0.90", fontsize=6.5, color="#C00000", va="top", ha="right")
+ex_y = np.log(0.877); ex_lo, ex_hi = np.exp(ex_y - 1.96 * se), np.exp(ex_y + 1.96 * se)
+ia.plot([0.877], [ia.get_ylim()[1] * 0.12], marker="v", color="#C00000", ms=6)
+ia.text(0.87, ia.get_ylim()[1] * 0.2, "example\nstudy", fontsize=6.3, color="#C00000", ha="right", linespacing=1.1)
+ia.set_xlabel("Observed HR, 10,000 studies", fontsize=7); ia.set_yticks([]); ia.tick_params(labelsize=6.5)
+ia.set_facecolor("white"); [ia.spines[s].set_visible(False) for s in ("top", "right", "left")]
+# panel 3: rules
+ex_st = np.sqrt(se ** 2 + 0.10 ** 2); ex_ba = np.exp(np.log(0.877) + 1.96 * ex_st)
+ex_s2 = se ** 2 + 0.10 ** 2; ex_v = 1 / (1 / 0.136 ** 2 + 1 / ex_s2); ex_m = ex_v * np.log(0.877) / ex_s2
+from math import erf
+ex_pb = 0.5 * (1 + erf((np.log(0.90) - ex_m) / np.sqrt(ex_v) / np.sqrt(2)))
+verdicts = ["Yes: P<0.001", f"No: upper {np.exp(np.log(0.877) + 1.96 * se):.3f}", f"No: upper {ex_ba:.2f}", f"No: P={100 * ex_pb:.0f}%", f"No: P={100 * ex_pb:.0f}%"]
+rules = [("P<0.05 with HR<1", "#7F7F7F", "HR<1.00"),
+         ("Upper 95% CI <0.90", "#ED7D31", "HR<0.90"),
+         ("Bias-aware CI: upper <0.90", "#BF9000", "HR<0.90"),
+         ("Bayes P(HR<0.90) >0.95", "#2F5597", "HR<0.90"),
+         ("Bayes P(HR<0.90) >0.80", "#70AD47", "HR<0.90")]
+ax.text(15.5, 13.95, "Example study: HR 0.877", fontsize=7.6, color="#C00000", fontweight="bold", va="center")
+ax.text(15.5, 13.35, f"(95% CI {ex_lo:.3f}–{ex_hi:.3f}); true HR 0.95", fontsize=6.9, color=GR, va="center")
+for i, (r, c, tg) in enumerate(rules):
+    y = 12.05 - i * 2.15
+    box(15.5, y - 0.85, 6.45, 1.75, fc="white", ec="#C9D6EC")
+    ax.add_patch(Rectangle((15.5, y - 0.85), 0.28, 1.75, fc=c, ec="none"))
+    ax.text(16.05, y + 0.3, r, fontsize=7.6, fontweight="bold", color=NV, va="center")
+    ax.text(16.05, y - 0.4, "Target: " + tg, fontsize=6.8, color=GR, va="center")
+    ax.text(21.8, y - 0.4, verdicts[i], fontsize=6.8, fontweight="bold", color=BL if verdicts[i].startswith("Yes") else GR, va="center", ha="right")
+ax.text(15.5, 1.25, "Assumed bias SD (0, 0.05, 0.10,\n0.20) and prior varied separately\nfrom the true pattern", fontsize=6.6, color=GR, va="center", linespacing=1.2)
+# panel 4: scoring
+box(22.95, 9.35, 6.45, 4.6, fc="white", ec="#C9D6EC")
+ax.text(23.3, 13.25, "True HR below 0.90", fontsize=8, fontweight="bold", color="#0f7563", va="center")
+ax.text(23.3, 12.3, "A declaration of benefit is a", fontsize=7.3, color=GR, va="center")
+ax.text(23.3, 11.5, "correct detection", fontsize=8.5, fontweight="bold", color="#0f7563", va="center")
+ax.text(23.3, 10.3, "(higher is better)", fontsize=7, color=GR, va="center")
+box(22.95, 4.35, 6.45, 4.6, fc="white", ec="#C9D6EC")
+ax.text(23.3, 8.25, "True HR 0.90 or higher", fontsize=8, fontweight="bold", color="#C00000", va="center")
+ax.text(23.3, 7.3, "A declaration of benefit is a", fontsize=7.3, color=GR, va="center")
+ax.text(23.3, 6.5, "false claim", fontsize=8.5, fontweight="bold", color="#C00000", va="center")
+ax.text(23.3, 5.85, "(lower is better)", fontsize=7, color=GR, va="center")
+ax.text(23.3, 4.95, "Example study (true HR 0.95): the\nfour No decisions avoid a false claim", fontsize=6.6, color="#C00000", va="center", linespacing=1.15)
+ax.text(23.0, 2.75, "Reported per scenario:\n% of studies declaring benefit\nand 95% interval coverage", fontsize=7.3, color=NV, va="center", linespacing=1.3)
+ax.text(23.0, 0.95, "P<0.05 is a reference for current\npractice, not scored against 0.90", fontsize=6.6, color=GR, va="center", linespacing=1.2)
+save(fig, "Supplementary_Figure_S2", facecolor="white")
