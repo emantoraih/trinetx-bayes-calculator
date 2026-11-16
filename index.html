@@ -93,9 +93,9 @@ footer{color:var(--muted);font-size:.85rem;text-align:center;padding:20px 16px 3
     <div><label for="lo">95% CI lower</label><input id="lo" type="number" step="0.01" min="0" value="0.92" inputmode="decimal"></div>
     <div><label for="hi">95% CI upper</label><input id="hi" type="number" step="0.01" min="0" value="0.98" inputmode="decimal"></div>
   </div>
-  <p class="hint">Enter the ratio and its 95% CI as reported. A ratio below 1 is assumed to favor the treatment.</p>
+  <p class="hint">Enter the ratio and its 95% CI as reported. A ratio below 1 is assumed to favor the treatment for an unwanted outcome; invert it for a wanted outcome or if the treatment is cohort 2 (see Guide).</p>
 
-  <label for="p0">Risk in the comparator group (%) <span class="hint">optional, for events per 1,000</span></label>
+  <label for="p0">Risk in the comparator group (%) <span class="hint">optional, for events per 1,000: 100 − Kaplan–Meier survival of the comparator</span></label>
   <div class="row2">
     <input id="p0" type="number" step="0.1" min="0" max="99" value="10" inputmode="decimal">
     <input id="tlab" type="text" value="one year" aria-label="Time point for the comparator risk">
@@ -169,13 +169,16 @@ footer{color:var(--muted);font-size:.85rem;text-align:center;padding:20px 16px 3
   </details>
   <details><summary>How to use it, step by step</summary>
     <ol>
-      <li>Copy the hazard ratio and its 95% confidence interval from the TriNetX output (Compare Outcomes, Hazard Ratio panel), or from any paper.</li>
-      <li>Enter the risk in the comparator group at the same time point (the Kaplan–Meier or risk estimate), if you want events per 1,000 patients.</li>
-      <li>Set the smallest benefit that would matter for this outcome. Decide this <b>before</b> looking at the result.</li>
+      <li><b>Check the direction.</b> The calculator assumes an unwanted outcome (for example death, hospitalization, or a side effect) and that the treatment is the first group, so a ratio below 1 means fewer events with the treatment. If the outcome is wanted (for example remission), or the treatment is TriNetX cohort 2, invert first: HR becomes 1/HR and the CI becomes 1/upper to 1/lower.</li>
+      <li>Copy the hazard ratio and its 95% CI from TriNetX (Compare Outcomes, Kaplan–Meier analysis, Hazard Ratio table), or from any paper.</li>
+      <li>For events per 1,000, enter the comparator risk: 100 minus the Kaplan–Meier survival probability of the <b>comparator</b> cohort at the end of the time window (for example 100 − 90.0 = 10%). Do not use the crude proportion with the outcome, which ignores patients lost to follow-up. If the window starts after the index date (a landmark), the risk applies from that day; if the proportionality test is clearly violated, report the Kaplan–Meier risk difference instead.</li>
+      <li>Set the smallest benefit that would matter for this outcome, with its source (for example a minimal clinically important difference, a guideline, or trial effect sizes). Decide this <b>before</b> looking at the result.</li>
       <li>Choose a bias allowance. This is a sensitivity setting, not an estimate of the bias in your study; 0.10 is a reasonable starting point for a propensity-matched observational study. Look at the sensitivity table to see how much the answer depends on it.</li>
-      <li>Keep the skeptical prior unless you have a clear reason. Compare with the weakly informative prior to check that the conclusion does not depend on the prior.</li>
-      <li>Press <b>Calculate and interpret</b>. Copy the suggested sentence into your Results section and report your assumptions.</li>
+      <li>Keep the skeptical prior, then repeat with the weakly informative prior and report both. If the two disagree, the study is too imprecise to dominate the prior.</li>
+      <li>Press <b>Calculate and interpret</b>. Read the probability of meaningful benefit if the ratio is below 1, and of meaningful harm if it is above 1, but report all three. Copy the suggested sentence, add the range across bias settings, and report your assumptions.</li>
+      <li>The wording of the summary uses fixed probability bands only to choose its words; they are not treatment thresholds. The probability needed before acting depends on harms, costs, alternatives, and patient preferences.</li>
     </ol>
+    <p class="hint">A full step-by-step guide with a flowchart, worked benefit and harm examples, and an author checklist is in the <a href="https://github.com/emantoraih/trinetx-bayes-calculator/tree/main/docs">docs folder</a>.</p>
   </details>
   <details><summary>Key terms</summary>
     <p><b>Meaningful benefit:</b> a reduction large enough to change practice. <b>Too small to matter:</b> effects between the benefit and harm thresholds. <b>Posterior median HR:</b> the middle value of the updated distribution; half the plausible values lie on each side. <b>Credible interval (CrI):</b> the range containing the true effect with 95% probability, given the assumptions. <b>Systematic error:</b> error from confounding, selection, or misclassification that more patients cannot fix.</p>
@@ -183,7 +186,7 @@ footer{color:var(--muted);font-size:.85rem;text-align:center;padding:20px 16px 3
   <details><summary>Limitations</summary>
     <p>Results depend on the stated assumptions. The bias allowance is centered on zero; if bias is known to favor one group, the calculator cannot correct its direction. The normal approximation is less accurate when events are few. The events per 1,000 assume proportional hazards. A single observational study can rarely establish a meaningful benefit with high probability once bias is allowed for; consistent results from several designs are more convincing.</p>
   </details>
-  <p class="hint" style="margin-top:12px">Free to use, no data leave your browser. Not affiliated with or endorsed by TriNetX, LLC. Accompanies the article “Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator” (in submission). Code released under the MIT License: <a href="https://github.com/emantoraih/trinetx-bayes-calculator">source code</a>; archived at <a href="https://doi.org/10.5281/zenodo.24213483">doi.org/10.5281/zenodo.24213483</a>. Version 1.0, November 2026.</p>
+  <p class="hint" style="margin-top:12px">Free to use, no data leave your browser. Not affiliated with or endorsed by TriNetX, LLC. Accompanies the article “Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator” (in submission). Code released under the MIT License: <a href="https://github.com/emantoraih/trinetx-bayes-calculator">source code</a>; archived at <a href="https://doi.org/10.5281/zenodo.24213483">doi.org/10.5281/zenodo.24213483</a>. Version 1.1, November 2026 (version 1.0 is the version described in the article).</p>
 </section>
 </main>
 
