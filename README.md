@@ -2,6 +2,11 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24269191.svg)](https://doi.org/10.5281/zenodo.24269191)
 
+> **How to cite.** If you use this calculator or code, please cite:
+> Toraih EA, Hussein MH, Jishu JA, Elshazli R, Fawzy MS. Bayesian Reading of Hazard Ratios: calculator and simulation code (version 1.1). Zenodo; 2026. https://doi.org/10.5281/zenodo.24269191
+>
+> The accompanying article, "Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator", is in submission; its reference will be added here after publication. You can also click **"Cite this repository"** in the right sidebar for APA and BibTeX formats.
+
 A free calculator that turns a hazard ratio (or risk ratio) and its 95% confidence interval, for example from TriNetX, into the probability that a treatment effect is large enough to matter, after allowing for systematic error (bias).
 
 **Use it online:** https://emantoraih.github.io/trinetx-bayes-calculator/
