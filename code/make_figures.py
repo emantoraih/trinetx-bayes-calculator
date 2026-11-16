@@ -37,8 +37,9 @@ def save(fig, name, **kw):
     print("saved", name)
 
 
-RULES = [("P<0.05 benefit", "#7F7F7F", "o"), ("CI upper <0.90", "#ED7D31", "s"),
-         ("Bayes P>0.80, assumed bias SD 0.1", "#70AD47", "^"), ("Bayes P>0.95, assumed bias SD 0.1", "#2F5597", "D")]
+RULES = [("P<0.05 benefit", "#7F7F7F", "o", "-"), ("CI upper <0.90", "#ED7D31", "s", "-"),
+         ("Bias-aware CI upper <0.90, assumed bias SD 0.1", "#9B59B6", "v", "--"),
+         ("Bayes P>0.80, assumed bias SD 0.1", "#70AD47", "^", "-"), ("Bayes P>0.95, assumed bias SD 0.1", "#2F5597", "D", "-")]
 
 # ---------- Figure 1: worked example 1 ----------
 plt.rcParams.update({**BASE, "font.size": 9})
@@ -70,19 +71,19 @@ save(fig, "Figure_1", bbox_inches="tight")
 
 # ---------- Figure 2: simulation, symmetric systematic error SD 0.10, comparator risk 5% ----------
 k = sim[(sim.bias == "Symmetric SD 0.10") & (sim.p0 == 0.05)]
-names = ["P < 0.05", "Upper 95% CI < 0.90", "Bayesian, probability > 0.80", "Bayesian, probability > 0.95"]
+names = ["P < 0.05", "Upper 95% CI < 0.90", "Bias-aware upper 95% CI < 0.90", "Bayesian, probability > 0.80", "Bayesian, probability > 0.95"]
 fig, axs = plt.subplots(1, 3, figsize=(7.5, 2.9), sharey=True)
 for ax, hr, ttl in zip(axs, [1.00, 0.95, 0.80], ["A  True HR 1.00 (no effect)", "B  True HR 0.95 (too small)", "C  True HR 0.80 (meaningful)"]):
     d = k[k.trueHR == hr].sort_values("N")
-    for (col, c, m), nm in zip(RULES, names):
-        ax.plot(d.N, d[col] * 100, color=c, marker=m, ms=3.5, lw=1.2, label=nm)
+    for (col, c, m, ls), nm in zip(RULES, names):
+        ax.plot(d.N, d[col] * 100, color=c, marker=m, ms=3.5, lw=1.2, ls=ls, label=nm)
     ax.set_xscale("log"); ax.set_xticks([1e3, 1e4, 1e5, 5e5]); ax.set_xticklabels(["1,000", "10,000", "100,000", "500,000"], fontsize=7.5)
     ax.set_title(ttl, loc="left", fontsize=9, fontweight="bold"); ax.set_ylim(-2, 102)
     ax.spines[["top", "right"]].set_visible(False); ax.set_xlabel("Patients per group")
 axs[0].set_ylabel("Studies declaring benefit (%)")
 h, l = axs[0].get_legend_handles_labels()
-fig.legend(h, l, loc="lower center", ncol=4, frameon=False, fontsize=7.5, bbox_to_anchor=(0.5, -0.06))
-fig.tight_layout(rect=(0, 0.06, 1, 1))
+fig.legend(h, l, loc="lower center", ncol=3, frameon=False, fontsize=7.5, bbox_to_anchor=(0.5, -0.10))
+fig.tight_layout(rect=(0, 0.08, 1, 1))
 save(fig, "Figure_2", bbox_inches="tight")
 
 # ---------- Supplementary Figure S1: PubMed records mentioning TriNetX by year ----------
@@ -108,19 +109,19 @@ pats = ["None", "Symmetric SD 0.05", "Symmetric SD 0.10", "Symmetric SD 0.20",
         "Directional favoring comparator, mean +0.05, SD 0.05", "Heavy-tailed (t3) SD 0.10"]
 plab = ["No systematic error", "Symmetric, SD 0.05", "Symmetric, SD 0.10", "Symmetric, SD 0.20",
         "Favoring treatment,\nmean −0.05", "Favoring treatment,\nmean −0.10", "Favoring comparator,\nmean +0.05", "Heavy-tailed (t, 3 df),\nSD 0.10"]
-names = ["P < 0.05", "Upper 95% CI < 0.90", "Bayesian > 0.80", "Bayesian > 0.95"]
+names = ["P < 0.05", "Upper 95% CI < 0.90", "Bias-aware upper 95% CI < 0.90", "Bayesian > 0.80", "Bayesian > 0.95"]
 fig, axs = plt.subplots(3, 8, figsize=(13, 5.8), sharey=True, sharex=True)
 for j, (pt, pl) in enumerate(zip(pats, plab)):
     for i, hr in enumerate([1.00, 0.95, 0.80]):
         ax = axs[i, j]; dd = sim[(sim.bias == pt) & (sim.trueHR == hr) & (sim.p0 == 0.05)].sort_values("N")
-        for (col, c, mk), nm in zip(RULES, names): ax.plot(dd.N, dd[col] * 100, color=c, marker=mk, ms=2.5, lw=1, label=nm)
+        for (col, c, mk, ls), nm in zip(RULES, names): ax.plot(dd.N, dd[col] * 100, color=c, marker=mk, ms=2.5, lw=1, ls=ls, label=nm)
         ax.set_xscale("log"); ax.set_ylim(-2, 102); ax.spines[["top", "right"]].set_visible(False)
         ax.set_xticks([1e3, 1e4, 1e5]); ax.set_xticklabels(["1k", "10k", "100k"])
         if i == 0: ax.set_title(pl, fontsize=7.5, fontweight="bold")
         if j == 0: ax.set_ylabel(f"True HR {hr:.2f}\nDeclaring benefit (%)")
         if i == 2: ax.set_xlabel("Patients per group")
 h, l = axs[0, 0].get_legend_handles_labels()
-fig.legend(h, l, loc="lower center", ncol=4, frameon=False, bbox_to_anchor=(0.5, -0.02))
+fig.legend(h, l, loc="lower center", ncol=5, frameon=False, bbox_to_anchor=(0.5, -0.02))
 fig.tight_layout(rect=(0, 0.04, 1, 1))
 save(fig, "Supplementary_Figure_S4", bbox_inches="tight")
 
