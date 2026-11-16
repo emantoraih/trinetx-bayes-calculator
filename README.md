@@ -54,7 +54,7 @@ The calculator's posterior estimates and probabilities agree with the R code to 
 ## Citation
 Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator. [Journal, year, article DOI]
 
-Software: Toraih EA, Hussein MH, Jishu JA, Fawzy MS. Bayesian Reading of Hazard Ratios: calculator and simulation code (version 1.1). Zenodo; 2026. https://doi.org/10.5281/zenodo.24269191
+Software: Toraih EA, Hussein MH, Jishu JA, Elshazli R, Fawzy MS. Bayesian Reading of Hazard Ratios: calculator and simulation code (version 1.1). Zenodo; 2026. https://doi.org/10.5281/zenodo.24269191
 
 Not affiliated with or endorsed by TriNetX, LLC.
 
