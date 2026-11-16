@@ -59,7 +59,7 @@ The allowance for systematic error is centered on zero. It widens the uncertaint
 The calculator's posterior estimates and probabilities agree with the R code to four decimal places for all three worked examples under every prior and allowance for systematic error (36 combinations, 252 values).
 
 ## Citation
-Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator. [Journal, year, article DOI]
+Article: Toraih EA, Hussein MH, Jishu JA, Elshazli R, Fawzy MS. Interpreting Hazard Ratios From TriNetX: A Bayesian Method, Simulation, and Calculator. In submission; the journal reference will be added after publication.
 
 Software: Toraih EA, Hussein MH, Jishu JA, Elshazli R, Fawzy MS. Bayesian Reading of Hazard Ratios: calculator and simulation code (version 1.1). Zenodo; 2026. https://doi.org/10.5281/zenodo.24269191
 
