@@ -17,6 +17,8 @@ A free calculator that turns a hazard ratio (or risk ratio) and its 95% confiden
 
 ## Using it with a TriNetX result: step by step
 
+**Video walkthrough (5 minutes):** [How to use the calculator](https://github.com/emantoraih/trinetx-bayes-calculator/releases/download/v1.1/How_to_use_the_calculator_video.mp4)
+
 ![Flowchart](docs/flowchart.png)
 
 1. **Prespecify** the outcomes, the meaningful benefit threshold and its source (a minimal clinically important difference, a guideline or GRADE default, a regulatory margin, or trial effect sizes), the time window, the skeptical prior, and the bias allowance (0.10, varied from 0 to 0.20).
